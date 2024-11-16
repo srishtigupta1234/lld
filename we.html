@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+</body>
+</html>
+<script>
+    class Person {
+    constructor(name) {
+        this.name = name;
+    }
+}
+
+class Building {
+    #floors;
+    constructor(name, number, roomsPerFloor, slotAvailable, start) {
+        this.name = name;
+        this.#floors = [];
+        this.numberOfFloors = number;
+
+        for (let i = 0; i < number; i++) {
+            this.#floors.push(new Floor(i, roomsPerFloor, slotAvailable, start));
+        }
+    }
+
+    getFloors() {
+        return this.#floors;
+    }
+
+    addFloor(roomsPerFloor, slotAvailable, start) {
+        const newFloor = new Floor(this.#floors.length, roomsPerFloor, slotAvailable, start);
+        this.#floors.push(newFloor);
+        this.numberOfFloors = this.#floors.length;
+    }
+
+    deleteFloor() {
+        if (this.#floors.length > 0) {
+            this.#floors.pop();
+            this.numberOfFloors = this.#floors.length;
+        } else {
+            console.error("No floors left to delete!");
+        }
+    }
+
+    isFloorExist() {
+        if (this.#floors.length === 0) {
+            console.log("Floor not exist");
+        }
+    }
+
+    findSlot() {
+        for (let i = 0; i < this.numberOfFloors; i++) {
+            const floor = this.#floors[i];
+
+            // Iterate through meeting rooms on this floor
+            for (let room of floor.meetingrooms) {
+                // Iterate through slots in each room
+                for (let slot of room.slot) {
+                    if (!slot.book) {
+                        return { floorNumber: i, roomNumber: room.roomNumber, slot };
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    booking() {
+        const slotInfo = this.findSlot();
+        if (!slotInfo) {
+            console.log("No available slots!");
+            return false;
+        }
+
+        slotInfo.slot.book = true;
+        console.log("Booked slot:", slotInfo);
+        return slotInfo;
+    }
+}
+
+class Floor {
+    constructor(num, rooms, slot, start) {
+        this.floorNumber = num;
+        this.meetingrooms = [];
+        this.numberOfRooms = rooms;
+
+        for (let i = 0; i < this.numberOfRooms; i++) {
+            this.meetingrooms.push(new MeetingRoom(i, slot, start));
+        }
+    }
+
+    addRoom(slotAvailable, start) {
+        const newRoom = new MeetingRoom(this.meetingrooms.length, slotAvailable, start);
+        this.meetingrooms.push(newRoom);
+        this.numberOfRooms = this.meetingrooms.length;
+    }
+
+    deleteRoom() {
+        if (this.meetingrooms.length > 0) {
+            this.meetingrooms.pop();
+            this.numberOfRooms = this.meetingrooms.length;
+        } else {
+            console.error("No rooms left to delete!");
+        }
+    }
+
+    isRoomExist() {
+        if (this.meetingrooms.length === 0) {
+            console.log("Room not exist");
+        }
+    }
+}
+
+class MeetingRoom {
+    constructor(num, slot, start) {
+        this.roomNumber = num;
+        this.slot = [];
+        this.numberOfSlots = slot;
+
+        for (let i = 0; i < this.numberOfSlots; i++) {
+            this.slot.push(new Slot(i, start));
+        }
+    }
+
+    addSlot(start) {
+        const newSlot = new Slot(this.slot.length, start);
+        this.slot.push(newSlot);
+        this.numberOfSlots = this.slot.length;
+    }
+
+    deleteSlot() {
+        if (this.slot.length > 0) {
+            this.slot.pop();
+            this.numberOfSlots = this.slot.length;
+        } else {
+            console.error("No slot left to delete!");
+        }
+    }
+
+    isSlotExist() {
+        if (this.slot.length === 0) {
+            console.log("Slot not exist");
+        }
+    }
+}
+
+class Slot {
+    #isBooked;
+    constructor(i, s) {
+        this.slotNumber = i;
+        this.time = s;
+        this.#isBooked = false;
+    }
+
+    get book() {
+        return this.#isBooked;
+    }
+
+    set book(bool) {
+        this.#isBooked = bool;
+    }
+}
+
+// Example Usage:
+const myBuilding = new Building("Sky Tower", 1, 4, 4, "1 hr"); // 1 floor, 4 rooms, 4 slots per room
+myBuilding.booking(); // Books a slot
+myBuilding.booking(); // Books another slot
+myBuilding.booking(); // Continues booking until no slots are left
+console.log(myBuilding)
+</script>
